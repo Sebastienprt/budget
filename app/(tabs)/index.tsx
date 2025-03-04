@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../../components/ProfileAvatar';
 import ExpenseForm from '../../components/ExpenseForm';
+import IncomeForm from '../../components/IncomeForm';
 import ExpenseList, { Expense } from '../../components/ExpenseList';
 
 // Mock user data
@@ -59,6 +60,7 @@ export default function Dashboard() {
     ...initialIncomes
   ]);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [currentBalance, setCurrentBalance] = useState(userData.initialBalance);
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [monthlyExpenses, setMonthlyExpenses] = useState(0);
@@ -109,18 +111,14 @@ export default function Dashboard() {
     setShowExpenseForm(false);
   };
 
-  const addIncome = () => {
-    // Simple example of adding income
+  const addIncome = (newIncome: Omit<Expense, 'id'>) => {
     const income: Expense = {
+      ...newIncome,
       id: Date.now().toString(),
-      amount: 350,
-      date: new Date(),
-      category: 'salary',
-      description: 'Revenu supplémentaire',
       isIncome: true,
     };
-    
     setTransactions(prev => [income, ...prev]);
+    setShowIncomeForm(false);
   };
 
   const deleteTransaction = (id: string) => {
@@ -173,7 +171,7 @@ export default function Dashboard() {
           <View style={styles.actionButtons}>
             <TouchableOpacity 
               style={[styles.addButton, styles.incomeButton]}
-              onPress={addIncome}
+              onPress={() => setShowIncomeForm(true)}
             >
               <Ionicons name="add-circle" size={20} color="#fff" />
               <Text style={styles.addButtonText}>Revenu</Text>
@@ -196,6 +194,13 @@ export default function Dashboard() {
 
         {showExpenseForm && (
           <ExpenseForm onSubmit={addTransaction} />
+        )}
+
+        {showIncomeForm && (
+          <IncomeForm
+            onSubmit={addIncome}
+            onCancel={() => setShowIncomeForm(false)}
+          />
         )}
 
         <ExpenseList 
